@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator'; // ajuste o caminho conforme sua estrutura
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { registerUser } from '../services/userService'; // Importa o serviço
 
 type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 const RegisterScreen: React.FC = () => {
-  const [name, setName] = useState<string>('');
+  const [nome, setNome] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const navigation = useNavigation<RegisterScreenNavigationProp>();
 
-  const handleRegister = () => {
-    // Aqui você pode implementar a lógica de cadastro
-    console.log('Usuário registrado:', { name, email, password });
-    navigation.navigate('Login'); // Navega para a tela de Login após o cadastro
+  const handleRegister = async () => {
+    try {
+      await registerUser({ nome, email, password });
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      navigation.navigate('Login'); // Navega para a tela de Login após o cadastro
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Erro de Cadastro', error.message);
+      } else {
+        Alert.alert('Erro de Cadastro', 'Ocorreu um erro desconhecido.');
+      }
+    }
   };
 
   return (
@@ -23,8 +32,8 @@ const RegisterScreen: React.FC = () => {
       <Text style={styles.title}>Cadastro</Text>
       <TextInput
         style={styles.input}
-        value={name}
-        onChangeText={setName}
+        value={nome}
+        onChangeText={setNome}
         placeholder="Nome"
         autoCapitalize="words"
       />

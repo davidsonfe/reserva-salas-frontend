@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, ActivityIndicator } from 'react-native';
+import api from '../../services/api';
 
 type Room = {
   id: string;
-  name: string;
+  nome: string;
 };
 
 type RoomSelectorProps = {
@@ -11,17 +12,37 @@ type RoomSelectorProps = {
 };
 
 const RoomSelector: React.FC<RoomSelectorProps> = ({ onSelectRoom }) => {
-  const rooms: Room[] = [
-    { id: '101', name: 'Sala 101' },
-    { id: '102', name: 'Sala 102' },
-    // Adicione mais salas conforme necessário
-  ];
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const response = await api.get('/salas');
+        
+        // Certifique-se de que cada sala tem um nome de string
+        const validRooms = response.data.filter((room: Room) => typeof room.nome === 'string');
+        
+        setRooms(validRooms);
+      } catch (error) {
+        console.error('Erro ao carregar salas:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <View>
       <Text>Selecione uma Sala:</Text>
       {rooms.map((room) => (
-        <Button key={room.id} title={room.name} onPress={() => onSelectRoom(room)} />
+        <Button key={room.id} title={room.nome} onPress={() => onSelectRoom(room)} />
       ))}
     </View>
   );

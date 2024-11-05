@@ -11,7 +11,7 @@ import ReservationSummary from '../components/Reservations/ReservationSummary';
 
 type Room = {
   id: string;
-  name: string;
+  nome: string;
 };
 
 const ReservationScreen: React.FC = () => {

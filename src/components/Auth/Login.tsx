@@ -1,7 +1,8 @@
-import React, { useState, useContext, useEffect, useRef } from 'react'; // Importação corrigida
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Animated } from 'react-native';
+import React, { useState, useContext, useEffect, useRef } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Animated, Alert } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import api from '../../services/api';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -9,29 +10,41 @@ const Login: React.FC = () => {
   const { signIn, isSignedIn } = useContext(AuthContext);
   const navigation = useNavigation<any>();
 
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Valor inicial da animação
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const handleLogin = () => {
-    signIn(email, password);
+  const handleLogin = async () => {
+    try {
+      const response = await api.post('/usuario_sessions', { usuario: { email, password } });
+
+      if (response.status === 200) {
+        const { token, userName } = response.data;
+        
+        // Salva o token e autentica o usuário
+        signIn(email, password);
+        
+        // Navega para a tela 'Home' com o nome do usuário
+        navigation.navigate('Home', { userName });
+      }
+    } catch (error) {
+      Alert.alert('Erro de Login', 'Email ou senha incorretos. Tente novamente.');
+    }
   };
 
   const handleRegisterNavigation = () => {
-    navigation.navigate('Register'); // Navega para a tela de cadastro
+    navigation.navigate('Register');
   };
 
   useEffect(() => {
     if (isSignedIn) {
-      // Navega para 'Home' após o login bem-sucedido
-      navigation.navigate('Home', { userName: email }); // Passa o email ou nome de usuário
+      navigation.navigate('Home', { userName: email });
     }
-  }, [isSignedIn, navigation, email]); // Inclua email como dependência
+  }, [isSignedIn, navigation, email]);
 
   useEffect(() => {
-    // Iniciar animação de desvanecimento
     Animated.timing(fadeAnim, {
-      toValue: 1, // Alvo da animação
-      duration: 1500, // Duração em milissegundos
-      useNativeDriver: true, // Usar driver nativo para melhor desempenho
+      toValue: 1,
+      duration: 1500,
+      useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
 
