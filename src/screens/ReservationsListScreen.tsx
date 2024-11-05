@@ -1,24 +1,50 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-
-const reservations = [
-  { id: '1', date: '2024-11-04', time: '10:00', room: 'Sala A' },
-  { id: '2', date: '2024-11-05', time: '14:00', room: 'Sala B' },
-  { id: '3', date: '2024-11-06', time: '09:00', room: 'Sala C' },
-];
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { getReservations } from '../services/reservationService'; // Ajuste o caminho conforme necessário
 
 const ReservationsListScreen: React.FC = () => {
+  const [reservations, setReservations] = useState<any[]>([]); // Altere 'any' para um tipo mais específico se necessário
+  const [loading, setLoading] = useState<boolean>(true); // Estado de carregamento
+  const [error, setError] = useState<string | null>(null); // Estado de erro
+
+  useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        const data = await getReservations();
+        setReservations(data);
+      } catch (error) {
+        setError('Não foi possível carregar as reservas.');
+      } finally {
+        setLoading(false); // Fim do carregamento
+      }
+    };
+
+    fetchReservations();
+  }, []); // Chama apenas na montagem do componente
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#00796b" />; // Exibe um indicador de carregamento
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Lista de Reservas</Text>
       <FlatList
         data={reservations}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()} // Assegure-se que 'id' é uma string
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.itemText}>Data: {item.date}</Text>
-            <Text style={styles.itemText}>Horário: {item.time}</Text>
-            <Text style={styles.itemText}>Sala: {item.room}</Text>
+            <Text style={styles.itemText}>Data: {item.data}</Text>
+            <Text style={styles.itemText}>Horário: {item.hora}</Text>
+            <Text style={styles.itemText}>Sala: {item.sala_id}</Text>
           </View>
         )}
       />
@@ -53,6 +79,10 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 16,
     color: '#555',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
   },
 });
 

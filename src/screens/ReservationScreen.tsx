@@ -8,6 +8,7 @@ import { Calendar } from 'react-native-calendars';
 import TimeSelector from '../components/Reservations/TimeSelector';
 import RoomSelector from '../components/Reservations/RoomSelector';
 import ReservationSummary from '../components/Reservations/ReservationSummary';
+import { createReservation } from '../services/reservationService'; // Ajuste o caminho conforme necessário
 
 type Room = {
   id: string;
@@ -20,8 +21,27 @@ const ReservationScreen: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
-  const handleConfirm = () => {
-    console.log("Reserva Confirmada", { selectedDate, selectedTime, selectedRoom });
+  const handleConfirm = async () => {
+    if (selectedDate && selectedTime && selectedRoom) {
+      const reservaData = {
+        reserva: {
+          usuario_id: 1, // Defina o ID do usuário adequadamente
+          sala_id: selectedRoom.id,
+          data: selectedDate.toISOString().split('T')[0], // Formato 'YYYY-MM-DD'
+          hora: selectedTime
+        }
+      };
+  
+      try {
+        const result = await createReservation(reservaData.reserva);
+        console.log("Reserva confirmada com sucesso:", result);
+      } catch (error: any) { // Aqui estamos usando 'any'
+        console.error("Erro ao criar a reserva:", error.message);
+      }
+    } else {
+      console.warn("Selecione a data, o horário e a sala antes de confirmar.");
+    }
+
     navigation.navigate('ReservationsList');
   };
 

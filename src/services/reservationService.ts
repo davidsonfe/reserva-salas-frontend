@@ -1,9 +1,9 @@
 import api from './api';
 
 type ReservationData = {
-  date: string;
-  roomId: string;
-  timeSlot: string;
+  data: string;
+  sala_id: string;
+  hora: string;
 };
 
 export const createReservation = async (data: ReservationData) => {
