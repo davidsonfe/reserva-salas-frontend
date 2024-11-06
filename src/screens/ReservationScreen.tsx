@@ -25,7 +25,6 @@ const ReservationScreen: React.FC = () => {
     if (selectedDate && selectedTime && selectedRoom) {
       const reservaData = {
         reserva: {
-          usuario_id: 1, // Defina o ID do usuário adequadamente
           sala_id: selectedRoom.id,
           data: selectedDate.toISOString().split('T')[0], // Formato 'YYYY-MM-DD'
           hora: selectedTime
