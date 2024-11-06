@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Button } from 'react-native';
+import { format } from 'date-fns';
 
 type Room = {
   id: string;
@@ -14,14 +15,18 @@ type ReservationSummaryProps = {
 };
 
 const ReservationSummary: React.FC<ReservationSummaryProps> = ({ date, room, time, onConfirm }) => {
+  // Garantir que a data seja exibida no formato correto
+  const displayDate = date ? date.toLocaleDateString('pt-BR') : 'Nenhuma Data Selecionada';
+
   return (
     <View>
-      <Text>Data: {date ? date.toLocaleDateString() : 'Nenhuma Data Selecionada'}</Text>
+      <Text>Data: {displayDate}</Text>
       <Text>Sala: {room ? room.nome : 'Nenhuma Sala Selecionada'}</Text>
       <Text>Horário: {time || 'Nenhum Horário Selecionado'}</Text>
       <Button title="Confirmar Reserva" onPress={onConfirm} />
     </View>
   );
 };
+
 
 export default ReservationSummary;

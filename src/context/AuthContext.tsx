@@ -1,22 +1,21 @@
 import React, { createContext, useState, ReactNode } from 'react';
 
-// Define o tipo para o contexto de autenticação
 interface AuthContextType {
   isSignedIn: boolean;
-  signIn: (email: string, password: string) => void;
+  signIn: (userName: string) => void;
   signOut: () => void;
   errorMessage: string | null;
+  userName: string | null;
 }
 
-// Cria o contexto de autenticação com um valor padrão
 export const AuthContext = createContext<AuthContextType>({
   isSignedIn: false,
   signIn: () => {},
   signOut: () => {},
   errorMessage: null,
+  userName: null,
 });
 
-// Provedor do contexto de autenticação
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -24,26 +23,29 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
-  const signIn = (email: string, password: string) => {
-    // Implementar lógica de autenticação (ex.: verificar credenciais)
-    if (email === 'test@example.com' && password === 'password') {
+  const signIn = (nome: string) => {
+    if (nome) {
       setIsSignedIn(true);
+      setUserName(nome); // Salvando o nome do usuário
       setErrorMessage(null); // Limpa qualquer mensagem de erro
-      console.log('Usuário autenticado');
+      console.log('Usuário autenticado:', nome);
     } else {
       setErrorMessage('Credenciais inválidas');
       console.log('Credenciais inválidas');
     }
   };
+  
 
   const signOut = () => {
     setIsSignedIn(false);
+    setUserName(null);
     console.log('Usuário deslogado');
   };
 
   return (
-    <AuthContext.Provider value={{ isSignedIn, signIn, signOut, errorMessage }}>
+    <AuthContext.Provider value={{ isSignedIn, signIn, signOut, errorMessage, userName }}>
       {children}
     </AuthContext.Provider>
   );

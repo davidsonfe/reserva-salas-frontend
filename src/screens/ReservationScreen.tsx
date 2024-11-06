@@ -46,8 +46,17 @@ const ReservationScreen: React.FC = () => {
   };
 
   const onDayPress = (day: { dateString: string }) => {
-    setSelectedDate(new Date(day.dateString)); // Converte string para Date
+    // Criar um novo objeto Date com base na data selecionada (sem conversão para UTC)
+    const [year, month, dayOfMonth] = day.dateString.split('-');
+    const selectedDate = new Date(Number(year), Number(month) - 1, Number(dayOfMonth));
+  
+    // Atualizar a data sem ajustar para UTC ou fusos horários
+    setSelectedDate(selectedDate);
   };
+  
+  
+  
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -58,7 +67,12 @@ const ReservationScreen: React.FC = () => {
         <Calendar
           onDayPress={onDayPress}
           markedDates={{
-            [selectedDate ? selectedDate.toISOString().split('T')[0] : '']: { selected: true, marked: true, selectedColor: '#4CAF50' },
+            // Garantir que a data seja no formato correto YYYY-MM-DD para marcar no calendário
+            [selectedDate ? selectedDate.toISOString().split('T')[0] : '']: {
+              selected: true,
+              marked: true,
+              selectedColor: '#4CAF50'
+            },
           }}
           theme={{
             selectedDayBackgroundColor: '#4CAF50',
@@ -112,7 +126,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
-    color: '#00796b',
+    color: '#004d40',
   },
   section: {
     marginBottom: 15,

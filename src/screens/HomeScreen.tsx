@@ -1,10 +1,9 @@
-// HomeScreen.tsx
-
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { RouteProp } from '@react-navigation/native';
+import { AuthContext } from '../context/AuthContext';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
@@ -15,16 +14,31 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ route, navigation }) => {
-  const { userName } = route.params; // Obtendo o userName dos parâmetros
+  const { signOut } = useContext(AuthContext);
+  const userName = route.params?.userName || 'Usuário';
+
+  const handleLogout = () => {
+    signOut();
+    navigation.navigate('Login'); // Redireciona para a tela de login após o logout
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo, {userName}!</Text>
+      <Text style={styles.title}>Bem-vindo, {userName || 'Usuário'}!</Text>
+      
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('Reservation', { reservationId: undefined })}
       >
-        <Text style={styles.buttonText}>Go to Reservation</Text>
+        <Text style={styles.buttonText}>Ir para Reserva</Text>
+      </TouchableOpacity>
+      
+      {/* Botão de Logout */}
+      <TouchableOpacity
+        style={[styles.button, styles.logoutButton]}
+        onPress={handleLogout}
+      >
+        <Text style={styles.buttonText}>Sair</Text>
       </TouchableOpacity>
     </View>
   );
@@ -44,10 +58,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#4CAF50', // Cor do botão
+    backgroundColor: '#4CAF50',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
+    marginTop: 10,
+  },
+  logoutButton: {
+    backgroundColor: '#E53935', // Cor vermelha para o botão de logout
   },
   buttonText: {
     color: '#fff',

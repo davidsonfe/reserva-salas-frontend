@@ -15,20 +15,26 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     try {
       const response = await api.post('/usuario_sessions', { usuario: { email, password } });
-
-      if (response.status === 200) {
-        const { token, userName } = response.data;
-        
-        // Salva o token e autentica o usuário
-        signIn(email, password);
-        
-        // Navega para a tela 'Home' com o nome do usuário
-        navigation.navigate('Home', { userName });
+  
+      console.log('Resposta da API:', response.data); // Imprimir a resposta da API
+  
+      // Verifique se a resposta contém o nome de usuário
+      if (response.status === 200 && response.data?.usuario?.nome) {
+        const { nome } = response.data.usuario; // Acessando o campo correto para o nome
+  
+        signIn(nome); // Chamando signIn com o nome do usuário
+        navigation.navigate('Home', { userName: nome }); // Passando o nome para navegação
+      } else {
+        // Caso as credenciais sejam inválidas ou o nome do usuário não seja encontrado
+       
+        Alert.alert('Erro de Login', 'Email ou senha incorretos. Tente novamente.');
       }
     } catch (error) {
-      Alert.alert('Erro de Login', 'Email ou senha incorretos. Tente novamente.');
+      Alert.alert('Erro de Login', 'Erro na comunicação com o servidor. Tente novamente.');
+      console.error('Erro ao autenticar:', error);
     }
   };
+  
 
   const handleRegisterNavigation = () => {
     navigation.navigate('Register');
